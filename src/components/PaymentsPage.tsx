@@ -4,14 +4,25 @@ import { Container } from './components.tsx'
 import { I18N } from "../constants/i18n";
 import { API_URL } from "../constants/";
 import { formatAmount, formatDate } from "../utils/formatters"
-import { Title, SearchInput, SearchButton, ClearButton, TableWrapper, Table, TableBodyWrapper, TableHeaderWrapper, TableHeaderRow, TableHeader, TableRow, TableCell, StatusBadge } from "../components/components"
+import { Title, SearchInput, SearchButton, ClearButton, TableWrapper, Table, TableBodyWrapper, TableHeaderWrapper, TableHeaderRow, TableHeader, TableRow, TableCell, StatusBadge, ErrorBox } from "../components/components"
 
 export const PaymentsPage = () => {
   const [searchInputValue, setSearchInputValue] = useState<string>('')
   const [searchQueryValue, setSearchQueryValue] = useState<string>('')
+  const [isNotFound, setIsNotFound] = useState<boolean>(false);
   const { data, refetch, isPending, error } = useQuery({
     queryKey: ['payments'],
-    queryFn: () => fetch(`${API_URL}?search=${searchQueryValue}&page=1&pageSize=5`).then(r => r.json()),
+    queryFn: () => fetch(`${API_URL}?search=${searchQueryValue}&page=1&pageSize=5`).then(r => {
+      // Realy fighting with react-query error handling
+      // Doesn't seem to behave as described, but I'm new to it.
+      // This will do:
+      setIsNotFound(false);
+      if (r.status === 404) {
+        setIsNotFound(true);
+        return null;
+      }
+      return r.json();
+    }),
   })
 
   useEffect(() => {
@@ -44,11 +55,15 @@ export const PaymentsPage = () => {
         {I18N.CLEAR_FILTERS}
       </ClearButton>
     )}
+    { isNotFound ? (
+      <ErrorBox>{I18N.PAYMENT_NOT_FOUND}</ErrorBox>
+    )
+    : error && (
+      <ErrorBox>Error: {error.message}</ErrorBox>
+    )}
     {isPending ? (
       <div>Loading...</div>
-    ) : error ? (
-      <div>Error: {error}</div>
-    ) : (
+    ) : data?.payments && (
       <TableWrapper>
         <Table>
           <TableHeaderWrapper>

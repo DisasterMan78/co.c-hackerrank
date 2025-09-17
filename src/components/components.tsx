@@ -182,7 +182,7 @@ export const Spinner = styled.div`
 
 export const ErrorBox = styled.div`
   padding: 1rem;
-  margin-bottom: 1rem;
+  margin: 1rem 0;
   color: #b91c1c;
   background-color: #fee2e2;
   border-radius: 0.375rem;

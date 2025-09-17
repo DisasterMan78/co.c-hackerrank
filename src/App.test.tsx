@@ -207,19 +207,19 @@ describe("App - Step 3: Clear Filters", () => {
   });
 });
 
-// describe("App - Step 4: Handle Payment Not Found", () => {
-//   test("should display error message when payment ID is not found", async () => {
-//     render(<App />);
+describe("App - Step 4: Handle Payment Not Found", () => {
+  test("should display error message when payment ID is not found", async () => {
+    render(<App />);
 
-//     const searchInput = getSearchInput();
-//     const searchButton = screen.getByRole("button", { name: I18N.SEARCH_BUTTON });
+    const searchInput = getSearchInput();
+    const searchButton = screen.getByRole("button", { name: I18N.SEARCH_BUTTON });
 
-//     fireEvent.change(searchInput, { target: { value: "pay_404" } });
-//     fireEvent.click(searchButton);
+    fireEvent.change(searchInput, { target: { value: "pay_404" } });
+    fireEvent.click(searchButton);
 
-//     await waitForErrorMessage(I18N.PAYMENT_NOT_FOUND);
-//   });
-// });
+    await waitForErrorMessage(I18N.PAYMENT_NOT_FOUND);
+  });
+});
 
 // describe("App - Step 5: Handle Server Error", () => {
 //   test("should display error message when API returns 500", async () => {
