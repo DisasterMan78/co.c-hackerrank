@@ -1,9 +1,11 @@
+export type Currency = "USD" | "EUR" | "GBP" | "AUD" | "CAD" | "ZAR" | "JPY" | "CZK";
+
 export type Payment = {
   id: string, // This should be regexed
   customerName: string;
   amount: float;
   customerAddress: string;
-  currency: "USD" | "EUR" | "GBP" | "AUD" | "CAD" | "ZAR" | "JPY" | "CZK";
+  currency: Currency;
   status: string;
   date: string; // Should be constrained to valid data string patterns
   description: string;
@@ -15,5 +17,6 @@ export type PaymentSearchResponse = {
   total: number;
   page: number;
   pageSize: number;
-
 }
+
+export type ErrorStatus = 404 | 500;

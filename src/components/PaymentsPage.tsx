@@ -3,22 +3,23 @@ import { useQuery } from '@tanstack/react-query'
 import { Container } from './components.tsx'
 import { I18N } from "../constants/i18n";
 import { API_URL } from "../constants/";
-import { formatAmount, formatDate } from "../utils/formatters"
-import { Title, SearchInput, SearchButton, ClearButton, TableWrapper, Table, TableBodyWrapper, TableHeaderWrapper, TableHeaderRow, TableHeader, TableRow, TableCell, StatusBadge, ErrorBox } from "../components/components"
+import { formatAmount, formatDate } from "../utils/formatters";
+import { ErrorStatus } from "../types/payment"
+import { Title, SearchInput, SearchButton, ClearButton, TableWrapper, Table, TableBodyWrapper, TableHeaderWrapper, TableHeaderRow, TableHeader, TableRow, TableCell, StatusBadge, ErrorBox, Select } from "../components/components";
 
 export const PaymentsPage = () => {
   const [searchInputValue, setSearchInputValue] = useState<string>('')
   const [searchQueryValue, setSearchQueryValue] = useState<string>('')
-  const [isNotFound, setIsNotFound] = useState<boolean>(false);
+  const [isErrorStatus, setIsErrorStatus] = useState<ErrorStatus | null>(null);
   const { data, refetch, isPending, error } = useQuery({
     queryKey: ['payments'],
     queryFn: () => fetch(`${API_URL}?search=${searchQueryValue}&page=1&pageSize=5`).then(r => {
       // Realy fighting with react-query error handling
       // Doesn't seem to behave as described, but I'm new to it.
       // This will do:
-      setIsNotFound(false);
-      if (r.status === 404) {
-        setIsNotFound(true);
+      setIsErrorStatus(null);
+      if (r.status !== 200) {
+        setIsErrorStatus(r.status);
         return null;
       }
       return r.json();
@@ -55,8 +56,14 @@ export const PaymentsPage = () => {
         {I18N.CLEAR_FILTERS}
       </ClearButton>
     )}
-    { isNotFound ? (
-      <ErrorBox>{I18N.PAYMENT_NOT_FOUND}</ErrorBox>
+    { isErrorStatus ? (
+      <ErrorBox>{
+        isErrorStatus === 404 ?
+          I18N.PAYMENT_NOT_FOUND
+        : isErrorStatus === 500 ?
+          I18N.INTERNAL_SERVER_ERROR
+        : I18N.SOMETHING_WENT_WRONG
+      }</ErrorBox>
     )
     : error && (
       <ErrorBox>Error: {error.message}</ErrorBox>

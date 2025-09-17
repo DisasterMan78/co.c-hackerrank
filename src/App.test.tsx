@@ -221,19 +221,19 @@ describe("App - Step 4: Handle Payment Not Found", () => {
   });
 });
 
-// describe("App - Step 5: Handle Server Error", () => {
-//   test("should display error message when API returns 500", async () => {
-//     render(<App />);
+describe("App - Step 5: Handle Server Error", () => {
+  test("should display error message when API returns 500", async () => {
+    render(<App />);
 
-//     const searchInput = getSearchInput();
-//     const searchButton = screen.getByRole("button", { name: I18N.SEARCH_BUTTON });
+    const searchInput = getSearchInput();
+    const searchButton = screen.getByRole("button", { name: I18N.SEARCH_BUTTON });
 
-//     fireEvent.change(searchInput, { target: { value: "pay_500" } });
-//     fireEvent.click(searchButton);
+    fireEvent.change(searchInput, { target: { value: "pay_500" } });
+    fireEvent.click(searchButton);
 
-//     await waitForErrorMessage(I18N.INTERNAL_SERVER_ERROR);
-//   });
-// });
+    await waitForErrorMessage(I18N.INTERNAL_SERVER_ERROR);
+  });
+});
 
 // describe("App - Step 6: Currency Filter", () => {
 //   test("should have a currency filter dropdown", () => {
