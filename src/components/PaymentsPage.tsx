@@ -1,22 +1,36 @@
-import React from "react";
+import React, { useState } from "react";
 import { useQuery } from '@tanstack/react-query'
 import { Container } from './components.tsx'
 import { I18N } from "../constants/i18n";
 import { API_URL } from "../constants/";
 import { formatAmount, formatDate } from "../utils/formatters"
-import { TableWrapper, Table, TableBodyWrapper, TableHeaderWrapper, TableHeaderRow, TableHeader, TableRow, TableCell, StatusBadge } from "../components/components"
+import { Title, SearchInput, SearchButton, TableWrapper, Table, TableBodyWrapper, TableHeaderWrapper, TableHeaderRow, TableHeader, TableRow, TableCell, StatusBadge } from "../components/components"
 
 export const PaymentsPage = () => {
-  const { data, isPending, error } = useQuery({
+  const [searchValue, setSearchValue] = useState<string | null>(null)
+  const { data, refetch, isPending, error } = useQuery({
     queryKey: ['payments'],
-    queryFn: () => fetch(`${API_URL}?&page=1&pageSize=5`).then(r => r.json()),
+    queryFn: () => fetch(`${API_URL}?search=${searchValue||''}&page=1&pageSize=5`).then(r => r.json()),
   })
 
   return <Container>
+    <Title>All Payments</Title>
+    <SearchInput
+      name="search"
+      role="searchbox"
+      placeholder={I18N.SEARCH_PLACEHOLDER}
+      onChange={e => setSearchValue(e.target.value)}
+    />
+    <SearchButton
+      onClick={() => refetch()}
+      data-search-value={searchValue}
+    >
+      {I18N.SEARCH_BUTTON}
+    </SearchButton>
     {isPending ? (
       <div>Loading...</div>
     ) : error ? (
-      <div>Error: {error.message}</div>
+      <div>Error: {error}</div>
     ) : (
       <TableWrapper>
         <Table>

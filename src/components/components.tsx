@@ -42,6 +42,7 @@ export const FilterRow = styled.div`
 
 export const SearchInput = styled.input`
   width: 100%;
+  margin-right: 1rem;
   padding: 0.5rem 1rem;
   border: 1px solid #d1d5db;
   border-radius: 0.375rem;
