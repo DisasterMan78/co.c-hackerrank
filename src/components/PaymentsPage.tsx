@@ -1,17 +1,22 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useQuery } from '@tanstack/react-query'
 import { Container } from './components.tsx'
 import { I18N } from "../constants/i18n";
 import { API_URL } from "../constants/";
 import { formatAmount, formatDate } from "../utils/formatters"
-import { Title, SearchInput, SearchButton, TableWrapper, Table, TableBodyWrapper, TableHeaderWrapper, TableHeaderRow, TableHeader, TableRow, TableCell, StatusBadge } from "../components/components"
+import { Title, SearchInput, SearchButton, ClearButton, TableWrapper, Table, TableBodyWrapper, TableHeaderWrapper, TableHeaderRow, TableHeader, TableRow, TableCell, StatusBadge } from "../components/components"
 
 export const PaymentsPage = () => {
-  const [searchValue, setSearchValue] = useState<string | null>(null)
+  const [searchInputValue, setSearchInputValue] = useState<string>('')
+  const [searchQueryValue, setSearchQueryValue] = useState<string>('')
   const { data, refetch, isPending, error } = useQuery({
     queryKey: ['payments'],
-    queryFn: () => fetch(`${API_URL}?search=${searchValue||''}&page=1&pageSize=5`).then(r => r.json()),
+    queryFn: () => fetch(`${API_URL}?search=${searchQueryValue}&page=1&pageSize=5`).then(r => r.json()),
   })
+
+  useEffect(() => {
+    refetch();
+  }, [searchQueryValue, refetch]);
 
   return <Container>
     <Title>All Payments</Title>
@@ -19,14 +24,26 @@ export const PaymentsPage = () => {
       name="search"
       role="searchbox"
       placeholder={I18N.SEARCH_PLACEHOLDER}
-      onChange={e => setSearchValue(e.target.value)}
+      onChange={e => setSearchInputValue(e.target.value)}
+      value={searchInputValue}
     />
     <SearchButton
-      onClick={() => refetch()}
-      data-search-value={searchValue}
+      onClick={() => {
+        setSearchQueryValue(searchInputValue);
+      }}
     >
       {I18N.SEARCH_BUTTON}
     </SearchButton>
+    {searchQueryValue && (
+      <ClearButton
+        onClick={() => {
+          setSearchInputValue('');
+          setSearchQueryValue('');
+        }}
+      >
+        {I18N.CLEAR_FILTERS}
+      </ClearButton>
+    )}
     {isPending ? (
       <div>Loading...</div>
     ) : error ? (

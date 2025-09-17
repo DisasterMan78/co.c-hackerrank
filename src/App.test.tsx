@@ -19,6 +19,7 @@ export const waitForErrorMessage = async (expectedMessage: string, timeout = 100
     await waitFor(() => {
       expect(screen.getByText(expectedMessage)).toBeInTheDocument();
     }, { timeout });
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (error) {
     // If the expected message isn't found, let's see what error messages are actually on the page
     const errorElements = screen.queryAllByText(/error|not found|server/i);
@@ -148,43 +149,63 @@ describe("App - Step 2: Search by Payment ID", () => {
   });
 });
 
-// describe("App - Step 3: Clear Filters", () => {
-//   test("should show clear filters button when search is active", async () => {
-//     render(<App />);
+describe("App - Step 3: Clear Filters", () => {
+  test("should show clear filters button when search is active", async () => {
+    render(<App />);
 
-//     const searchInput = getSearchInput();
-//     const searchButton = screen.getByRole("button", { name: I18N.SEARCH_BUTTON });
+    const searchInput = getSearchInput();
+    const searchButton = screen.getByRole("button", { name: I18N.SEARCH_BUTTON });
 
-//     fireEvent.change(searchInput, { target: { value: "pay_134_1" } });
-//     fireEvent.click(searchButton);
+    // Added to confirm button is NOT present before
+    // search filter is active
+    expect(screen.queryByRole("button", { name: I18N.CLEAR_FILTERS })).not.toBeInTheDocument();
 
-//     await waitFor(() => {
-//       expect(screen.getByRole("button", { name: I18N.CLEAR_FILTERS })).toBeInTheDocument();
-//     });
-//   });
+    fireEvent.change(searchInput, { target: { value: "pay_134_1" } });
+    fireEvent.click(searchButton);
 
-//   test("should clear all filters when clear button is clicked", async () => {
-//     render(<App />);
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: I18N.CLEAR_FILTERS })).toBeInTheDocument();
+    });
+  });
 
-//     const searchInput = getSearchInput();
-//     const searchButton = screen.getByRole("button", { name: I18N.SEARCH_BUTTON });
+  test("should clear all filters when clear button is clicked", async () => {
+    render(<App />);
 
-//     // Perform a search
-//     fireEvent.change(searchInput, { target: { value: "pay_134_1" } });
-//     fireEvent.click(searchButton);
+    const searchInput = getSearchInput();
+    const searchButton = screen.getByRole("button", { name: I18N.SEARCH_BUTTON });
 
-//     await waitFor(() => {
-//       expect(screen.getByText("pay_134_1")).toBeInTheDocument();
-//     });
+    // Perform a search
+    fireEvent.change(searchInput, { target: { value: "pay_134_1" } });
 
-//     // Clear filters
-//     const clearButton = screen.getByRole("button", { name: I18N.CLEAR_FILTERS });
-//     fireEvent.click(clearButton);
+    // Either the fireEvent and check for results is unnecessary, or there should be a check to see if
+    // the results change AFTER clearing too - the spec is not entirely clear on the desired behaviour.
+    // If the Clear button is supposed to also trigger a requery, there should be a negative check for
+    // unwanted values while the filter is active as per the previous test followed by a check to see
+    // they are returned after clearing the filter
+    // I am going to assume that the Clear button should clear the input AND reset the results
+    // as it is more complex and more fun to do.
+    // Ordinarily I would confirm the desired behaviour with the project manager!
 
-//     // Check that search input is cleared
-//     expect(searchInput).toHaveValue("");
-//   });
-// });
+    fireEvent.click(searchButton);
+
+    await waitFor(() => {
+      expect(screen.getByText("pay_134_1")).toBeInTheDocument();
+      // Added a negative test to fix the false positive
+      expect(screen.queryByText("pay_134_2")).not.toBeInTheDocument();
+    });
+
+    // Clear filters
+    const clearButton = screen.getByRole("button", { name: I18N.CLEAR_FILTERS });
+    fireEvent.click(clearButton);
+
+    // Check that search input is cleared
+    expect(searchInput).toHaveValue("");
+
+    await waitFor(() => {
+      expect(screen.queryByText("pay_134_2")).toBeInTheDocument();
+    });
+  });
+});
 
 // describe("App - Step 4: Handle Payment Not Found", () => {
 //   test("should display error message when payment ID is not found", async () => {

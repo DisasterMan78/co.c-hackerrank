@@ -42,8 +42,8 @@ export const FilterRow = styled.div`
 
 export const SearchInput = styled.input`
   width: 100%;
-  margin-right: 1rem;
   padding: 0.5rem 1rem;
+  margin-right: 0.5rem;
   border: 1px solid #d1d5db;
   border-radius: 0.375rem;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
@@ -80,6 +80,7 @@ export const Select = styled.select`
 
 export const SearchButton = styled.button`
   padding: 0.5rem 1rem;
+  margin: 0 0.5rem;
   background-color: rgb(61, 108, 209);
   color: white;
   border-radius: 0.375rem;
@@ -92,6 +93,7 @@ export const SearchButton = styled.button`
 
 export const ClearButton = styled.button`
   padding: 0.5rem 1rem;
+  margin: 0 0.5rem;
   background-color: #6b7280;
   color: white;
   border-radius: 0.375rem;
