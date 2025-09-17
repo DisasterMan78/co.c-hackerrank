@@ -70,6 +70,11 @@ export const handlers = [
     });
 
     if (filteredPayments.length === 0) {
+      // THIS IS WRONG!
+      // This is not how you use a 404
+      // It is not for data results not found
+      // It is for RESOURCES - the resource is the API endpoint
+      // The API endpoint HAS been found, it is NOT a 404
       return HttpResponse.json(
         { message: "Payment not found" },
         { status: 404, statusText: "Not Found" }
