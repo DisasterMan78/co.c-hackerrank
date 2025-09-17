@@ -206,11 +206,29 @@ export const PaginationRow = styled.div`
   color: #374151;
 `;
 
-export const PaginationButton = styled.button`
+export const PaginationButtonPrev = styled.button`
   padding: 0.25rem 0.75rem;
   border: 1px solid #d1d5db;
   border-radius: 0.375rem;
   transition: background-color 0.2s ease;
+  float:left;
+
+  &:hover:not(:disabled) {
+    background-color: #f3f4f6;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+`;
+
+export const PaginationButtonNext = styled.button`
+  padding: 0.25rem 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+  transition: background-color 0.2s ease;
+  float:right;
 
   &:hover:not(:disabled) {
     background-color: #f3f4f6;

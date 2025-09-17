@@ -5,16 +5,17 @@ import { I18N } from "../constants/i18n";
 import { API_URL, CURRENCIES } from "../constants/";
 import { formatAmount, formatDate } from "../utils/formatters";
 import { ErrorStatus, SearchCurrency } from "../types/payment"
-import { Title, SearchInput, SearchButton, ClearButton, TableWrapper, Table, TableBodyWrapper, TableHeaderWrapper, TableHeaderRow, TableHeader, TableRow, TableCell, StatusBadge, ErrorBox, Select } from "../components/components";
+import { Title, SearchInput, SearchButton, ClearButton, TableWrapper, Table, TableBodyWrapper, TableHeaderWrapper, TableHeaderRow, TableHeader, TableRow, TableCell, StatusBadge, ErrorBox, Select, PaginationButtonPrev, PaginationButtonNext } from "../components/components";
 
 export const PaymentsPage = () => {
   const [searchInputValue, setSearchInputValue] = useState<string>('');
   const [searchQueryValue, setSearchQueryValue] = useState<string>('');
   const [searchCurrencyValue, setSearchCurrencyValue] = useState<SearchCurrency>('');
+  const [searchPageValue, setSearchPageValue] = useState<number>(1);
   const [isErrorStatus, setIsErrorStatus] = useState<ErrorStatus | null>(null);
   const { data, refetch, isPending, error } = useQuery({
     queryKey: ['payments'],
-    queryFn: () => fetch(`${API_URL}?search=${searchQueryValue}&currency=${searchCurrencyValue}&page=1&pageSize=5`).then(r => {
+    queryFn: () => fetch(`${API_URL}?search=${searchQueryValue}&currency=${searchCurrencyValue}&page=${searchPageValue}&pageSize=5`).then(async r => {
       // Realy fighting with react-query error handling
       // Doesn't seem to behave as described, but I'm new to it.
       // This will do:
@@ -23,13 +24,18 @@ export const PaymentsPage = () => {
         setIsErrorStatus(r.status);
         return null;
       }
+
       return r.json();
     }),
   })
 
   useEffect(() => {
+    console.log(data)
+  }, [data]);
+
+  useEffect(() => {
     refetch();
-  }, [searchQueryValue, searchCurrencyValue, refetch]);
+  }, [searchQueryValue, searchCurrencyValue, searchPageValue, refetch]);
 
   return <Container>
     <Title>All Payments</Title>
@@ -57,9 +63,7 @@ export const PaymentsPage = () => {
       )}
     </Select>
     <SearchButton
-      onClick={() => {
-        setSearchQueryValue(searchInputValue);
-      }}
+      onClick={() => setSearchQueryValue(searchInputValue)}
     >
       {I18N.SEARCH_BUTTON}
     </SearchButton>
@@ -101,21 +105,45 @@ export const PaymentsPage = () => {
             </TableHeaderRow>
           </TableHeaderWrapper>
           <TableBodyWrapper>
-          {data.payments.map(row => (
-            <TableRow key={row.id}>
-              <TableCell>{row.id}</TableCell>
-              <TableCell>{formatDate(row.date)}</TableCell>
-              <TableCell>{formatAmount(row.amount)}</TableCell>
-              <TableCell>{row.customerName}</TableCell>
-              <TableCell>{row.currency}</TableCell>
+            {data.payments.map(row => (
+              <TableRow key={row.id}>
+                <TableCell>{row.id}</TableCell>
+                <TableCell>{formatDate(row.date)}</TableCell>
+                <TableCell>{formatAmount(row.amount)}</TableCell>
+                <TableCell>{row.customerName}</TableCell>
+                <TableCell>{row.currency}</TableCell>
+                <TableCell>
+                  <StatusBadge status={row.status}>{row.status}</StatusBadge>
+                </TableCell>
+              </TableRow>
+            ))}
+            <TableRow>
               <TableCell>
-                <StatusBadge status={row.status}>{row.status}</StatusBadge>
+                <PaginationButtonPrev
+                  onClick={() => setSearchPageValue(searchPageValue - 1)}
+                  disabled={searchPageValue === 1}
+                >
+                  {I18N.PREVIOUS_BUTTON}
+                </PaginationButtonPrev>
+              </TableCell>
+              <TableCell
+                colSpan={4}
+                align="center"
+              >
+                {`${I18N.PAGE_LABEL} ${searchPageValue}`}
+              </TableCell>
+              <TableCell>
+                <PaginationButtonNext
+                  onClick={() => setSearchPageValue(searchPageValue + 1)}
+                >
+                  {I18N.NEXT_BUTTON}
+                </PaginationButtonNext>
+
               </TableCell>
             </TableRow>
-          ))}
           </TableBodyWrapper>
         </Table>
       </TableWrapper>
-      )}
+    )}
   </Container>;
 };

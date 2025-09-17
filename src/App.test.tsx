@@ -91,7 +91,7 @@ describe("App - Step 1: Basic Payment List", () => {
 
     // Check that 5 payments are displayed (pageSize=5)
     const tableRows = screen.getAllByRole("row");
-    expect(tableRows).toHaveLength(6); // 1 header row + 5 data rows
+    expect(tableRows).toHaveLength(7); // 1 header row + 5 data rows + pagination row
   });
 
   test("should format amounts and dates using the formatters", async () => {
@@ -319,117 +319,122 @@ describe("App - Step 7: Combined Currency and Payment ID Filter", () => {
   });
 });
 
-// describe("App - Step 8: Pagination", () => {
-//   test("should display pagination controls", async () => {
-//     render(<App />);
+describe("App - Step 8: Pagination", () => {
+  test("should display pagination controls", async () => {
+    render(<App />);
 
-//     await waitFor(() => {
-//       expect(screen.getByRole("table")).toBeInTheDocument();
-//       expect(screen.getAllByRole("cell").length).toBeGreaterThan(0);
-//     });
+    await waitFor(() => {
+      expect(screen.getByRole("table")).toBeInTheDocument();
+      expect(screen.getAllByRole("cell").length).toBeGreaterThan(0);
+    });
 
-//     // Check for pagination buttons
-//     expect(screen.getByRole("button", { name: I18N.PREVIOUS_BUTTON })).toBeInTheDocument();
-//     expect(screen.getByRole("button", { name: I18N.NEXT_BUTTON })).toBeInTheDocument();
-//   });
+    // Check for pagination buttons
+    expect(screen.getByRole("button", { name: I18N.PREVIOUS_BUTTON })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: I18N.NEXT_BUTTON })).toBeInTheDocument();
+  });
 
-//   test("should display current page number", async () => {
-//     render(<App />);
+  test("should display current page number", async () => {
+    render(<App />);
 
-//     await waitFor(() => {
-//       expect(screen.getByRole("table")).toBeInTheDocument();
-//       expect(screen.getAllByRole("cell").length).toBeGreaterThan(0);
-//     });
+    await waitFor(() => {
+      expect(screen.getByRole("table")).toBeInTheDocument();
+      expect(screen.getAllByRole("cell").length).toBeGreaterThan(0);
+    });
 
-//     // Check that page number is displayed
-//     expect(screen.getByText(`${I18N.PAGE_LABEL} 1`)).toBeInTheDocument();
-//   });
+    // Check that page number is displayed
+    expect(screen.getByText(`${I18N.PAGE_LABEL} 1`)).toBeInTheDocument();
+  });
 
-//   test("should disable previous button on first page", async () => {
-//     render(<App />);
+  test("should disable previous button on first page", async () => {
+    render(<App />);
 
-//     await waitFor(() => {
-//       expect(screen.getByRole("table")).toBeInTheDocument();
-//       expect(screen.getAllByRole("cell").length).toBeGreaterThan(0);
-//     });
+    await waitFor(() => {
+      expect(screen.getByRole("table")).toBeInTheDocument();
+      expect(screen.getAllByRole("cell").length).toBeGreaterThan(0);
+    });
 
-//     const previousButton = screen.getByRole("button", { name: I18N.PREVIOUS_BUTTON });
-//     expect(previousButton).toBeDisabled();
-//   });
+    const previousButton = screen.getByRole("button", { name: I18N.PREVIOUS_BUTTON });
+    expect(previousButton).toBeDisabled();
+  });
 
-//   test("should enable previous button after navigating to next page", async () => {
-//     render(<App />);
+  test("should enable previous button after navigating to next page", async () => {
+    render(<App />);
 
-//     await waitFor(() => {
-//       expect(screen.getByRole("table")).toBeInTheDocument();
-//       expect(screen.getAllByRole("cell").length).toBeGreaterThan(0);
-//     });
+    await waitFor(() => {
+      expect(screen.getByRole("table")).toBeInTheDocument();
+      expect(screen.getAllByRole("cell").length).toBeGreaterThan(0);
+    });
 
-//     const nextButton = screen.getByRole("button", { name: I18N.NEXT_BUTTON });
-//     fireEvent.click(nextButton);
+    const nextButton = screen.getByRole("button", { name: I18N.NEXT_BUTTON });
+    fireEvent.click(nextButton);
 
-//     await waitFor(() => {
-//       expect(screen.getByText(`${I18N.PAGE_LABEL} 2`)).toBeInTheDocument();
-//     });
+    await waitFor(() => {
+      expect(screen.getByText(`${I18N.PAGE_LABEL} 2`)).toBeInTheDocument();
+    });
 
-//     const previousButton = screen.getByRole("button", { name: I18N.PREVIOUS_BUTTON });
-//     expect(previousButton).not.toBeDisabled();
-//   });
+    const previousButton = screen.getByRole("button", { name: I18N.PREVIOUS_BUTTON });
+    expect(previousButton).not.toBeDisabled();
+  });
 
-//   test("should show different payments on next page", async () => {
-//     render(<App />);
+  test("should show different payments on next page", async () => {
+    render(<App />);
 
-//     await waitFor(() => {
-//       expect(screen.getByRole("table")).toBeInTheDocument();
-//       expect(screen.getAllByRole("cell").length).toBeGreaterThan(0);
-//     });
+    await waitFor(() => {
+      expect(screen.getByRole("table")).toBeInTheDocument();
+      expect(screen.getAllByRole("cell").length).toBeGreaterThan(0);
+    });
 
-//     // Get first page payments
-//     const firstPagePayments = screen.getAllByRole("row").slice(1); // Exclude header
-//     const firstPagePaymentIds = firstPagePayments.map(row =>
-//       row.querySelector('td')?.textContent
-//     );
+    // Get first page payments
+    const firstPagePayments = screen.getAllByRole("row").slice(1); // Exclude header
+    const firstPagePaymentIds = firstPagePayments.map(row =>
+      row.querySelector('td')?.textContent
+    );
 
-//     // Navigate to next page
-//     const nextButton = screen.getByRole("button", { name: I18N.NEXT_BUTTON });
-//     fireEvent.click(nextButton);
+    // Navigate to next page
+    const nextButton = screen.getByRole("button", { name: I18N.NEXT_BUTTON });
+    fireEvent.click(nextButton);
 
-//     await waitFor(() => {
-//       expect(screen.getByText(`${I18N.PAGE_LABEL} 2`)).toBeInTheDocument();
-//     });
+    await waitFor(() => {
+      expect(screen.getByText(`${I18N.PAGE_LABEL} 2`)).toBeInTheDocument();
+    });
 
-//     // Get second page payments
-//     const secondPagePayments = screen.getAllByRole("row").slice(1); // Exclude header
-//     const secondPagePaymentIds = secondPagePayments.map(row =>
-//       row.querySelector('td')?.textContent
-//     );
+    // Get second page payments
+    const secondPagePayments = screen.getAllByRole("row").slice(1, -1); // Exclude header and pagination
+    const secondPagePaymentIds = secondPagePayments.map(row =>
+      row.querySelector('td')?.textContent
+    );
 
-//     // Check that payments are different
-//     expect(secondPagePaymentIds).not.toEqual(firstPagePaymentIds);
-//   });
+    // Check that payments are different
+    expect(secondPagePaymentIds).not.toEqual(firstPagePaymentIds);
+  });
 
-//   test("should navigate back to previous page", async () => {
-//     render(<App />);
+  test("should navigate back to previous page", async () => {
+    render(<App />);
 
-//     await waitFor(() => {
-//       expect(screen.getByRole("table")).toBeInTheDocument();
-//       expect(screen.getAllByRole("cell").length).toBeGreaterThan(0);
-//     });
+    await waitFor(() => {
+      expect(screen.getByRole("table")).toBeInTheDocument();
+      expect(screen.getAllByRole("cell").length).toBeGreaterThan(0);
+    });
 
-//     // Navigate to next page
-//     const nextButton = screen.getByRole("button", { name: I18N.NEXT_BUTTON });
-//     fireEvent.click(nextButton);
+    // Navigate to next page
+    const nextButton = screen.getByRole("button", { name: I18N.NEXT_BUTTON });
+    fireEvent.click(nextButton);
 
-//     await waitFor(() => {
-//       expect(screen.getByText(`${I18N.PAGE_LABEL} 2`)).toBeInTheDocument();
-//     });
+    await waitFor(() => {
+      expect(screen.getByText(`${I18N.PAGE_LABEL} 2`)).toBeInTheDocument();
+    });
 
-//     // Navigate back to previous page
-//     const previousButton = screen.getByRole("button", { name: I18N.PREVIOUS_BUTTON });
-//     fireEvent.click(previousButton);
+    // Navigate back to previous page
+    const previousButton = screen.getByRole("button", { name: I18N.PREVIOUS_BUTTON });
+    fireEvent.click(previousButton);
 
-//     await waitFor(() => {
-//       expect(screen.getByText(`${I18N.PAGE_LABEL} 1`)).toBeInTheDocument();
-//     });
-//   });
-// });
+    await waitFor(() => {
+      expect(screen.getByText(`${I18N.PAGE_LABEL} 1`)).toBeInTheDocument();
+    });
+
+    // Should have provision for disabling Next pagination button on last page, and
+    // tests for it, which is calculable from data.total and data.pageSize
+    // Would require resetting whenever search parameters change
+
+  });
+});
