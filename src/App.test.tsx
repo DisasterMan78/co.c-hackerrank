@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor, within } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import {
   afterAll,
@@ -235,76 +235,89 @@ describe("App - Step 5: Handle Server Error", () => {
   });
 });
 
-// describe("App - Step 6: Currency Filter", () => {
-//   test("should have a currency filter dropdown", () => {
-//     render(<App />);
+describe("App - Step 6: Currency Filter", () => {
+  test("should have a currency filter dropdown", () => {
+    render(<App />);
 
-//     const currencySelect = screen.getByRole("combobox", { name: I18N.CURRENCY_FILTER_LABEL });
-//     expect(currencySelect).toBeInTheDocument();
-//   });
+    const currencySelect = screen.getByRole("combobox", { name: I18N.CURRENCY_FILTER_LABEL });
+    expect(currencySelect).toBeInTheDocument();
+  });
 
-//   test("should filter payments by currency when selected", async () => {
-//     render(<App />);
+  test("should filter payments by currency when selected", async () => {
+    render(<App />);
 
-//     const currencySelect = screen.getByRole("combobox", { name: I18N.CURRENCY_FILTER_LABEL });
+    const currencySelect = screen.getByRole("combobox", { name: I18N.CURRENCY_FILTER_LABEL });
 
-//     fireEvent.change(currencySelect, { target: { value: "USD" } });
+    fireEvent.change(currencySelect, { target: { value: "USD" } });
 
-//     await waitFor(() => {
-//       const usdPayments = screen.getAllByText("USD");
-//       expect(usdPayments.length).toBeGreaterThan(0);
-//     });
-//   });
+    await waitFor(() => {
+      const usdPayments = screen.getAllByText("USD");
+      expect(usdPayments.length).toBeGreaterThan(0);
+    });
+  });
 
-//   test("should show all currencies in dropdown options", () => {
-//     render(<App />);
+  test("should show all currencies in dropdown options", () => {
+    render(<App />);
 
-//     // Check that all currency options are available in the select element
-//     expect(screen.getByRole("option", { name: "USD" })).toBeInTheDocument();
-//     expect(screen.getByRole("option", { name: "EUR" })).toBeInTheDocument();
-//     expect(screen.getByRole("option", { name: "GBP" })).toBeInTheDocument();
-//     expect(screen.getByRole("option", { name: "AUD" })).toBeInTheDocument();
-//     expect(screen.getByRole("option", { name: "CAD" })).toBeInTheDocument();
-//     expect(screen.getByRole("option", { name: "ZAR" })).toBeInTheDocument();
-//   });
+    // Check that all currency options are available in the select element
+    expect(screen.getByRole("option", { name: "USD" })).toBeInTheDocument();
+    expect(screen.getByRole("option", { name: "EUR" })).toBeInTheDocument();
+    expect(screen.getByRole("option", { name: "GBP" })).toBeInTheDocument();
+    expect(screen.getByRole("option", { name: "AUD" })).toBeInTheDocument();
+    expect(screen.getByRole("option", { name: "CAD" })).toBeInTheDocument();
+    expect(screen.getByRole("option", { name: "ZAR" })).toBeInTheDocument();
+  });
 
-//   test("should allow selecting currency options", () => {
-//     render(<App />);
+  test("should allow selecting currency options", () => {
+    render(<App />);
 
-//     const currencySelect = screen.getByRole("combobox", { name: I18N.CURRENCY_FILTER_LABEL });
+    const currencySelect = screen.getByRole("combobox", { name: I18N.CURRENCY_FILTER_LABEL });
 
-//     // Select USD option
-//     fireEvent.change(currencySelect, { target: { value: "USD" } });
-//     expect(currencySelect).toHaveValue("USD");
+    // Select USD option
+    fireEvent.change(currencySelect, { target: { value: "USD" } });
+    expect(currencySelect).toHaveValue("USD");
 
-//     // Select EUR option
-//     fireEvent.change(currencySelect, { target: { value: "EUR" } });
-//     expect(currencySelect).toHaveValue("EUR");
-//   });
-// });
+    // Select EUR option
+    fireEvent.change(currencySelect, { target: { value: "EUR" } });
+    expect(currencySelect).toHaveValue("EUR");
+  });
+});
 
-// describe("App - Step 7: Combined Currency and Payment ID Filter", () => {
-//   test("should filter by both currency and payment ID", async () => {
-//     render(<App />);
+describe("App - Step 7: Combined Currency and Payment ID Filter", () => {
+  test("should filter by both currency and payment ID", async () => {
+    render(<App />);
 
-//     const searchInput = getSearchInput();
-//     const searchButton = screen.getByRole("button", { name: I18N.SEARCH_BUTTON });
-//     const currencySelect = screen.getByRole("combobox", { name: I18N.CURRENCY_FILTER_LABEL });
+    const searchInput = getSearchInput();
+    const searchButton = screen.getByRole("button", { name: I18N.SEARCH_BUTTON });
+    const currencySelect = screen.getByRole("combobox", { name: I18N.CURRENCY_FILTER_LABEL });
+    const table = screen.getByRole("table");
 
-//     // Search for a specific payment
-//     fireEvent.change(searchInput, { target: { value: "pay_134" } });
-//     fireEvent.click(searchButton);
+    // Search for a specific payment
+    fireEvent.change(searchInput, { target: { value: "pay_134" } });
+    fireEvent.click(searchButton);
 
-//     // Filter by currency
-//     fireEvent.change(currencySelect, { target: { value: "USD" } });
+    // Filter by currency
+    fireEvent.change(currencySelect, { target: { value: "USD" } });
 
-//     await waitFor(() => {
-//       // Should show payments that match both criteria
-//       const usdPayments = screen.getAllByText("USD");
-//       expect(usdPayments.length).toBeGreaterThan(0);
-//     });
-//   });
-// });
+    await waitFor(() => {
+      expect(currencySelect).toHaveValue("USD");
+      // Should show payments that match both criteria
+      const usdPayments = screen.getAllByText("USD");
+      expect(usdPayments.length).toBeGreaterThan(0);
+
+      // Another sloppy false positive test - didn't prove other currencies have been
+      // filtered
+      // Using `within()` to avoid picking up the currency select
+      const eurPayments = within(table).queryAllByText("EUR");
+      expect(eurPayments.length).toEqual(0);
+
+      // Didn't prove other payments have been
+      // filtered
+      const filteredPayment = screen.queryAllByText("pay_134_2");
+      expect(filteredPayment.length).toEqual(0);
+    });
+  });
+});
 
 // describe("App - Step 8: Pagination", () => {
 //   test("should display pagination controls", async () => {

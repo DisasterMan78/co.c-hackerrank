@@ -2,18 +2,19 @@ import React, { useEffect, useState } from "react";
 import { useQuery } from '@tanstack/react-query'
 import { Container } from './components.tsx'
 import { I18N } from "../constants/i18n";
-import { API_URL } from "../constants/";
+import { API_URL, CURRENCIES } from "../constants/";
 import { formatAmount, formatDate } from "../utils/formatters";
-import { ErrorStatus } from "../types/payment"
+import { ErrorStatus, SearchCurrency } from "../types/payment"
 import { Title, SearchInput, SearchButton, ClearButton, TableWrapper, Table, TableBodyWrapper, TableHeaderWrapper, TableHeaderRow, TableHeader, TableRow, TableCell, StatusBadge, ErrorBox, Select } from "../components/components";
 
 export const PaymentsPage = () => {
-  const [searchInputValue, setSearchInputValue] = useState<string>('')
-  const [searchQueryValue, setSearchQueryValue] = useState<string>('')
+  const [searchInputValue, setSearchInputValue] = useState<string>('');
+  const [searchQueryValue, setSearchQueryValue] = useState<string>('');
+  const [searchCurrencyValue, setSearchCurrencyValue] = useState<SearchCurrency>('');
   const [isErrorStatus, setIsErrorStatus] = useState<ErrorStatus | null>(null);
   const { data, refetch, isPending, error } = useQuery({
     queryKey: ['payments'],
-    queryFn: () => fetch(`${API_URL}?search=${searchQueryValue}&page=1&pageSize=5`).then(r => {
+    queryFn: () => fetch(`${API_URL}?search=${searchQueryValue}&currency=${searchCurrencyValue}&page=1&pageSize=5`).then(r => {
       // Realy fighting with react-query error handling
       // Doesn't seem to behave as described, but I'm new to it.
       // This will do:
@@ -28,7 +29,7 @@ export const PaymentsPage = () => {
 
   useEffect(() => {
     refetch();
-  }, [searchQueryValue, refetch]);
+  }, [searchQueryValue, searchCurrencyValue, refetch]);
 
   return <Container>
     <Title>All Payments</Title>
@@ -39,6 +40,22 @@ export const PaymentsPage = () => {
       onChange={e => setSearchInputValue(e.target.value)}
       value={searchInputValue}
     />
+    <Select
+      name="currencies"
+      aria-label={I18N.CURRENCY_FILTER_LABEL}
+      onChange={e => setSearchCurrencyValue(e.target.value)}
+      role="combobox"
+    >
+      <option value="">{I18N.EMPTY_CURRENCY}</option>
+      {CURRENCIES.map(currency =>
+        <option
+          key={currency}
+          value={currency}
+        >
+          {currency}
+        </option>
+      )}
+    </Select>
     <SearchButton
       onClick={() => {
         setSearchQueryValue(searchInputValue);

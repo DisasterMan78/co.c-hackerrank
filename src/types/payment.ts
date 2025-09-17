@@ -1,5 +1,7 @@
 export type Currency = "USD" | "EUR" | "GBP" | "AUD" | "CAD" | "ZAR" | "JPY" | "CZK";
 
+export type SearchCurrency = Currency & '';
+
 export type Payment = {
   id: string, // This should be regexed
   customerName: string;
