@@ -30,10 +30,6 @@ export const PaymentsPage = () => {
   })
 
   useEffect(() => {
-    console.log(data)
-  }, [data]);
-
-  useEffect(() => {
     refetch();
   }, [searchQueryValue, searchCurrencyValue, searchPageValue, refetch]);
 
