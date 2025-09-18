@@ -5,7 +5,7 @@ export type SearchCurrency = Currency & '';
 export type Payment = {
   id: string, // This should be regexed
   customerName: string;
-  amount: float;
+  amount: number;
   customerAddress: string;
   currency: Currency;
   status: string;

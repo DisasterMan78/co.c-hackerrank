@@ -1,16 +1,16 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useQuery } from '@tanstack/react-query'
 import { Container } from './components.tsx'
 import { I18N } from "../constants/i18n";
 import { API_URL, CURRENCIES } from "../constants/";
 import { formatAmount, formatDate } from "../utils/formatters";
-import { ErrorStatus, SearchCurrency } from "../types/payment"
+import { ErrorStatus, Payment, SearchCurrency } from "../types/payment"
 import { Title, SearchInput, SearchButton, ClearButton, TableWrapper, Table, TableBodyWrapper, TableHeaderWrapper, TableHeaderRow, TableHeader, TableRow, TableCell, StatusBadge, ErrorBox, Select, PaginationButtonPrev, PaginationButtonNext } from "../components/components";
 
 export const PaymentsPage = () => {
   const [searchInputValue, setSearchInputValue] = useState<string>('');
   const [searchQueryValue, setSearchQueryValue] = useState<string>('');
-  const [searchCurrencyValue, setSearchCurrencyValue] = useState<SearchCurrency>('');
+  const [searchCurrencyValue, setSearchCurrencyValue] = useState<SearchCurrency>('' as SearchCurrency);
   const [searchPageValue, setSearchPageValue] = useState<number>(1);
   const [isErrorStatus, setIsErrorStatus] = useState<ErrorStatus | null>(null);
   const { data, refetch, isPending, error } = useQuery({
@@ -21,7 +21,7 @@ export const PaymentsPage = () => {
       // This will do:
       setIsErrorStatus(null);
       if (r.status !== 200) {
-        setIsErrorStatus(r.status);
+        setIsErrorStatus(r.status as ErrorStatus);
         return null;
       }
 
@@ -49,7 +49,7 @@ export const PaymentsPage = () => {
     <Select
       name="currencies"
       aria-label={I18N.CURRENCY_FILTER_LABEL}
-      onChange={e => setSearchCurrencyValue(e.target.value)}
+      onChange={e => setSearchCurrencyValue(e.target.value as SearchCurrency)}
       role="combobox"
     >
       <option value="">{I18N.EMPTY_CURRENCY}</option>
@@ -105,7 +105,7 @@ export const PaymentsPage = () => {
             </TableHeaderRow>
           </TableHeaderWrapper>
           <TableBodyWrapper>
-            {data.payments.map(row => (
+            {data.payments.map((row: Payment) => (
               <TableRow key={row.id}>
                 <TableCell>{row.id}</TableCell>
                 <TableCell>{formatDate(row.date)}</TableCell>
